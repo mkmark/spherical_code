@@ -6,7 +6,7 @@
 #include <fstream>
 #include <limits>
 
-#include <src/solver/util.hpp>
+#include <src/solver/Vector3.hpp>
 
 class NotImplemented : public std::logic_error
 {
@@ -14,31 +14,30 @@ public:
   NotImplemented() : std::logic_error("Function not yet implemented") { };
 };
 
+template <typename T>
 class SolverBase{
 public:
   int min_step = -1;
   int max_step;
-  double tol;
+  T tol;
   int n;
-  int n3;
-  double alpha;
-  std::vector<double> c_points;
-  std::vector<double> s_points;
-  std::vector<double> grads;
+  T alpha;
+  std::vector<Vector3<T>> c_points;
+  std::vector<Vector3<T>> grads;
   std::string dump_base_path;
   std::string load_base_path;
 
   int step = 0;
-  double value = DBL_MAX;
-  double value_prev;
-  double diff;
+  T value = DBL_MAX;
+  T value_prev;
+  T diff;
 
   SolverBase(
     int n = 0,
     std::string dump_base_path = "",
-    std::vector<double> c_points_init = std::vector<double>(),
-    double tol = 1e-15,
-    double alpha_init = 0.001,
+    std::vector<Vector3<T>> c_points_init = std::vector<Vector3<T>>(),
+    T tol = 1e-15,
+    T alpha_init = 0.001,
     int max_step = INT32_MAX
   ):
     n(n),
@@ -48,10 +47,8 @@ public:
     max_step(max_step),
     dump_base_path(dump_base_path)
   {
-    n3 = n*3;
-    c_points.resize(n3);
-    s_points.resize(n3);
-    grads.resize(n3);
+    c_points.resize(n);
+    grads.resize(n);
     value = DBL_MAX;
   }
 
@@ -69,24 +66,9 @@ public:
 
     gen_grads();
 
-    for (int i = 0; i<n3; ++i){
+    for (int i = 0; i<n; ++i){
       c_points[i] -= alpha * grads[i];
-    }
-
-
-    // to_s_points(c_points, s_points);
-    // s_points[1] = 0;
-    // s_points[2] = M_PI/2;
-    // // #pragma omp parallel for
-    // for (int i=0; i<n3; i+=3){
-    //   s_points[i] = 1;
-    // }
-    // to_c_points(s_points, c_points);
-
-
-    for (int i=0; i<n3; i+=3){
-      auto cp_i = c_points.begin() + i;
-      c_point_self_div(cp_i, c_point_l2norm(cp_i));
+      c_points[i].normalize();
     }
   }
 
@@ -115,11 +97,13 @@ public:
     std::ofstream outfile(path);
     if (outfile.is_open())
     {
-      outfile << std::setprecision(std::numeric_limits<double>::max_digits10);
+      outfile << std::setprecision(std::numeric_limits<T>::max_digits10);
 
       for (auto& elem : c_points)
       {
-        outfile << elem << "\n";
+        outfile << elem.x << "\n";
+        outfile << elem.y << "\n";
+        outfile << elem.z << "\n";
       }
 
       outfile.close();

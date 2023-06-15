@@ -5,28 +5,28 @@
 #include <chrono>
 #include <cmath>
 
-#include <src/solver/SolverBase.hpp>
-#include <src/solver/util.hpp>
-
 #include <omp.h>
 
+#include <src/solver/SolverBase.hpp>
+#include <src/solver/Vector3.hpp>
 
-class SolverMinPotentialNaive : public SolverBase{
+
+template <typename T>
+class SolverMinPotentialNaive : public SolverBase<T>{
 public:
-  // double temperature;
-  // double cooling_factor;
+  // T temperature;
+  // T cooling_factor;
   // int cooling_step_count;
-  // double cooling_delta;
+  // T cooling_delta;
 
   SolverMinPotentialNaive(
     int n,
     std::string dump_base_path = "",
-    std::vector<double> c_points_init = std::vector<double>(),
-    double tol = 1e-15,
-    double alpha_init = 0.1,
+    std::vector<Vector3<T>> c_points_init = std::vector<Vector3<T>>(),
+    T tol = 1e-15,
+    T alpha_init = 0.1,
     int max_step = INT32_MAX
-  ):
-  SolverBase(
+  ) : SolverBase<T>(
     n,
     dump_base_path,
     c_points_init,
@@ -35,16 +35,14 @@ public:
     max_step
   )
   {
-    for(int i=0; i<n3; i++) {
-      c_points[i] = drand48();
+    for(int i=0; i<n; ++i) {
+      this->c_points[i].x = drand48();
+      this->c_points[i].y = drand48();
+      this->c_points[i].z = drand48();
+      this->c_points[i].normalize();
     }
 
-    for (int i=0; i<n3; i+=3){
-      auto cp_i = c_points.begin() + i;
-      c_point_self_div(cp_i, c_point_l2norm(cp_i));
-    }
-
-    alpha = 100.0/n/n;
+    this->alpha = 100.0/n/n;
 
     // temperature = sqrt(8*sqrt(3)*M_PI/9/n);
     // cooling_factor = 0.9;
@@ -53,23 +51,30 @@ public:
     // min_step = cooling_step_count;
   }
 
-  std::vector<double> direction = std::vector<double>(3);
-  std::vector<double> grad = std::vector<double>(3);
+  Vector3<T> direction;
+  Vector3<T> grad;
 
   void gen_grads(){
-    std::fill(grads.begin(), grads.end(), 0);
+    // std::fill(this->grads.begin(), this->grads.end(), 0);
 
-    for (int i=0; i<n3; i+=3){
-      auto cp_i = c_points.begin() + i;
-      for (int j=i+3; j<n3; j+=3){
-        c_point_sub(cp_i, c_points.begin() + j, direction.begin());
-        auto norm2 = c_point_l2norm2(direction.begin());
+    for (auto& grad : this->grads){
+      grad.x = 0;
+      grad.y = 0;
+      grad.z = 0;
+    }
+
+    for (int i=0; i<this->n; ++i){
+      for (int j=i+1; j<this->n; ++j){
+        direction = this->c_points[i] - this->c_points[j];
+
+        auto norm2 = direction.getLengthSquared();
         auto norm = std::sqrt(norm2);
-        c_point_div(direction.begin(), norm2*norm, grad.begin());
-        value += 1/norm;
+        grad = direction / (norm2 * norm);
 
-        c_point_self_sub(grads.begin() + i, grad.begin());
-        c_point_self_add(grads.begin() + j, grad.begin());
+        this->value += 1/norm;
+
+        this->grads[i] -= grad;
+        this->grads[j] += grad;
       }
     }
   }
