@@ -26,7 +26,7 @@
       "miDebuggerPath": "/usr/bin/gdb"
     },
     {
-      "name": "g++ - Build and run active file optimized",
+      "name": "g++ - Build and run active file O3",
       "type": "cppdbg",
       "request": "launch",
       "program": "${fileDirname}/${fileBasenameNoExtension}.o3.out",
@@ -43,7 +43,7 @@
           "ignoreFailures": true
         }
       ],
-      "preLaunchTask": "C/C++: g++ build active file optimized",
+      "preLaunchTask": "C/C++: g++ build active file O3",
       "miDebuggerPath": "/usr/bin/gdb"
     }
   ]

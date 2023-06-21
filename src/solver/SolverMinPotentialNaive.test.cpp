@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
 
   /// input
   /// n
-  int n = 20;
+  int n = 100;
   /// seed
   srand48(42);
   /// dump_base_path

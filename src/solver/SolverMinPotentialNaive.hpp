@@ -51,25 +51,20 @@ public:
     // min_step = cooling_step_count;
   }
 
-  Vector3<T> direction;
-  Vector3<T> grad;
-
   void gen_grads(){
-    // std::fill(this->grads.begin(), this->grads.end(), 0);
-
     for (auto& grad : this->grads){
       grad.x = 0;
       grad.y = 0;
       grad.z = 0;
     }
 
-    for (int i=0; i<this->n; ++i){
-      for (int j=i+1; j<this->n; ++j){
-        direction = this->c_points[i] - this->c_points[j];
+    for (int i = 0; i < this->n; ++i){
+      for (int j = i+1; j < this->n; ++j){
+        auto direction = this->c_points[i] - this->c_points[j];
 
         auto norm2 = direction.getLengthSquared();
         auto norm = std::sqrt(norm2);
-        grad = direction / (norm2 * norm);
+        auto grad = direction / (norm2 * norm);
 
         this->value += 1/norm;
 
