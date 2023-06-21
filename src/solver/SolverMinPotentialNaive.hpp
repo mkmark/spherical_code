@@ -5,10 +5,10 @@
 #include <chrono>
 #include <cmath>
 
-#include <omp.h>
+// #include <omp.h>
 
-#include <src/solver/SolverBase.hpp>
-#include <src/solver/Vector3.hpp>
+#include "src/solver/SolverBase.hpp"
+#include "src/solver/Vector3.hpp"
 
 
 template <typename T>

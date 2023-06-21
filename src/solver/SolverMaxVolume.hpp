@@ -7,10 +7,10 @@
 
 #include <omp.h>
 
-#include <include/quickhull/QuickHull.cpp>
+#include "include/quickhull/QuickHull.cpp"
 
-#include <src/solver/SolverBase.hpp>
-#include <src/solver/Vector3.hpp>
+#include "src/solver/SolverBase.hpp"
+#include "src/solver/Vector3.hpp"
 
 
 template <typename T>
@@ -55,7 +55,9 @@ public:
 
   Vector3<T> direction;
   Vector3<T> grad;
-  quickhull::QuickHull<double> qh;
+  quickhull::QuickHull<T> qh;
+  quickhull::ConvexHull<T> hull;
+  std::vector<unsigned long> indexBuffer = std::vector<unsigned long>();
 
   Vector3<T> pV_px(Vector3<T> a, Vector3<T> b){
     return Vector3<T>(
@@ -72,8 +74,10 @@ public:
       grad.z = 0;
     }
 
-    quickhull::ConvexHull<T> hull = qh.getConvexHull(this->c_points, true, true, 1e-7);
-    const auto& indexBuffer = hull.getIndexBuffer();
+    if (this->step % 100 == 0){
+      hull = qh.getConvexHull(this->c_points, true, true, 1e-7);
+      indexBuffer = hull.getIndexBuffer();
+    }
 
     for (int i = 0; i < indexBuffer.size(); i+=3){
       auto ia = indexBuffer[i];

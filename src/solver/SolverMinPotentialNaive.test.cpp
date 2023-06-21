@@ -1,4 +1,4 @@
-#include <src/solver/SolverMinPotentialNaive.hpp>
+#include "src/solver/SolverMinPotentialNaive.hpp"
 
 
 int main(int argc, char* argv[])
