@@ -19,6 +19,8 @@ public:
   // int cooling_step_count;
   // T cooling_delta;
 
+  T d;
+
   SolverMinPotentialNaive(
     int n,
     std::string dump_base_path = "",
@@ -44,6 +46,8 @@ public:
 
     this->alpha = 100.0/n/n;
 
+    d = 2.199/sqrt(this->n)/20;
+
     // temperature = sqrt(8*sqrt(3)*M_PI/9/n);
     // cooling_factor = 0.9;
     // cooling_step_count = 40;
@@ -52,6 +56,7 @@ public:
   }
 
   void gen_grads(){
+    T max_grad = 0;
     for (auto& grad : this->grads){
       grad.x = 0;
       grad.y = 0;
@@ -66,12 +71,16 @@ public:
         auto norm = std::sqrt(norm2);
         auto grad = direction / (norm2 * norm);
 
-        this->value += 1/norm;
+        T v = 1/norm;
+        this->value += v;
+        max_grad = std::max(max_grad, v);
 
         this->grads[i] -= grad;
         this->grads[j] += grad;
       }
     }
+
+    this->alpha = d/max_grad;
   }
 
   void before_step(){
