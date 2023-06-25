@@ -44,8 +44,6 @@ public:
       this->c_points[i].normalize();
     }
 
-    this->alpha = 100.0/n/n;
-
     // temperature = sqrt(8*sqrt(3)*M_PI/9/n);
     // cooling_factor = 0.9;
     // cooling_step_count = 40;
@@ -74,7 +72,7 @@ public:
       grad.z = 0;
     }
 
-    if (this->step % 100 == 0){
+    if (this->step % 1000 == 0){
       hull = qh.getConvexHull(this->c_points, true, true, 1e-7);
       indexBuffer = hull.getIndexBuffer();
     }
@@ -93,6 +91,44 @@ public:
       this->grads[ib] += pV_px(c, a);
       this->grads[ic] += pV_px(a, b);
     }
+  }
+
+  bool is_validated(){
+    this->value_prev = this->value;
+    this->value = 0;
+
+    for (auto& grad : this->grads){
+      grad.x = 0;
+      grad.y = 0;
+      grad.z = 0;
+    }
+
+    hull = qh.getConvexHull(this->c_points, true, true, 1e-7);
+    indexBuffer = hull.getIndexBuffer();
+
+    for (int i = 0; i < indexBuffer.size(); i+=3){
+      auto ia = indexBuffer[i];
+      auto ib = indexBuffer[i+1];
+      auto ic = indexBuffer[i+2];
+      auto a = this->c_points[ia];
+      auto b = this->c_points[ib];
+      auto c = this->c_points[ic];
+
+      this->value -= (a.y*b.z*c.x + a.x*b.y*c.z + a.z*b.x*c.y - a.y*b.x*c.z - a.z*b.y*c.x - a.x*b.z*c.y)/6;
+
+      this->grads[ia] += pV_px(b, c);
+      this->grads[ib] += pV_px(c, a);
+      this->grads[ic] += pV_px(a, b);
+    }
+
+    for (int i = 0; i < this->n; ++i){
+      this->c_points[i] -= this->alpha * this->grads[i];
+      this->c_points[i].normalize();
+    }
+
+    ++this->step;
+    this->diff = this->value_prev - this->value;
+    return std::abs(this->diff) < this->tol;
   }
 
   void before_step(){

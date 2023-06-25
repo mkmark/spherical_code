@@ -72,15 +72,19 @@ public:
     }
   }
 
+  virtual bool is_validated(){
+    return 1;
+  }
+
   void solve(){
     while (1){
       step_next();
-      step += 1;
+      ++step;
 
       if (step <= min_step) continue;
       if (step > max_step) break;
       diff = value_prev - value;
-      if (std::abs(diff) < tol) break;
+      if (std::abs(diff) < tol && is_validated()) break;
     }
 
     if (dump_base_path != ""){
