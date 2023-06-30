@@ -14,9 +14,9 @@
 template <typename T>
 class SolverMinPotentialNaive : public SolverBase<T>{
 public:
-  // T temperature;
-  // T cooling_factor;
-  // int cooling_step_count;
+  T temperature;
+  T cooling_factor;
+  int cooling_step_count;
   // T cooling_delta;
 
   T d;
@@ -48,11 +48,11 @@ public:
 
     d = 2.199/sqrt(this->n)/20;
 
-    // temperature = sqrt(8*sqrt(3)*M_PI/9/n);
-    // cooling_factor = 0.9;
-    // cooling_step_count = 40;
-    // // cooling_delta = 0.1*temperature/cooling_step_count;
-    // min_step = cooling_step_count;
+    temperature = 2.199/sqrt(this->n);
+    cooling_factor = 0.9996;
+    cooling_step_count = 10000;
+    // cooling_delta = 0.1*temperature/cooling_step_count;
+    this->min_step = cooling_step_count;
   }
 
   void gen_grads(){
@@ -84,17 +84,16 @@ public:
   }
 
   void before_step(){
-    // if (step < cooling_step_count){
-    //   for(int i=0; i<n3; i++) {
-    //     c_points[i] += temperature * (drand48() - 0.5);
-    //   }
+    if (this->step < cooling_step_count){
+      for(int i=0; i < this->n; i++) {
+        this->c_points[i].x += temperature * (drand48() - 0.5);
+        this->c_points[i].y += temperature * (drand48() - 0.5);
+        this->c_points[i].z += temperature * (drand48() - 0.5);
 
-    //   for (int i=0; i<n3; i+=3){
-    //     auto cp_i = c_points.begin() + i;
-    //     c_point_self_div(cp_i, c_point_l2norm(cp_i));
-    //   }
+        this->c_points[i].normalize();
+      }
 
-    //   temperature *= cooling_factor;
-    // }
+      temperature *= cooling_factor;
+    }
   }
 };
