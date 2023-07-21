@@ -128,9 +128,6 @@ class ResourceMonitor():
     self.cpu_physical_cnt = psutil.cpu_count(logical = False)
     self.cpu_logical_cnt = psutil.cpu_count(logical = True)
 
-    if socket.gethostname() == "zju109092050wu":
-      self.cpu_physical_cnt = 48
-    
     self._gen_cpu_percent()
 
     thread_watch_cpu_percent = threading.Thread(target=self._watch_cpu_percent)

@@ -4,12 +4,14 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}",
+                "${workspaceFolder}/opt/libtorch/include/torch/csrc/api/include",
+                "${workspaceFolder}/opt/libtorch/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c17",
             "cppStandard": "gnu++14",
-            "intelliSenseMode": "linux-gcc-x64",
+            "intelliSenseMode": "linux-gcc-x64"
         }
     ],
     "version": 4

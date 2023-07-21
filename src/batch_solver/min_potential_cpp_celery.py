@@ -5,7 +5,7 @@ ver = "v1.0.2"
 ns = range(4, 300)
 """the range of n to calculate within current run"""
 
-min_min_count = 10
+min_min_count = 20
 """
 this value determines the minimum occurence of a minimum solution
 before it is deemed as a global minimum
