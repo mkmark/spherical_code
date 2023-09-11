@@ -20,4 +20,7 @@ conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvi
 ## https://github.com/taichi-dev/taichi
 pip install taichi
 
+## for result visulization
+conda install pandas
+
 conda env export > environment.yml

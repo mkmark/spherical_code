@@ -49,6 +49,8 @@ def get_dict_with_default(d, n, default=0):
     d[n] = default
     return default
 
+import tqdm
+
 def get_status(
   ns=None,
   gen_missed_tasks=False
@@ -106,7 +108,8 @@ def get_batch_size(n):
   so the result is still an estimate at best.
   It is estimated that $p(n)=1/(1 + 1.85404472e-05*n**4)$ according to $n < 256$.
   """
-  return int(-2/np.log10(1 - 1/(1 + 1.85404472e-05*n**4))/10) + 1
+  return max(10000, int(-2/np.log10(1 - 1/(1 + 1.85404472e-05*n**4))/10) + 1)
+  # return int(-2/np.log10(1 - 1/(1 + 1.85404472e-05*n**4))/10) + 1
 
   ## until v1.0.1
   # return int(-2/np.log10(1 - 1/(1 + 1.85404472e-05*n**4))) + 1
@@ -114,7 +117,6 @@ def get_batch_size(n):
   # return n
 
 # %%
-import tqdm
 from src.batch_solver.celery.tasks import exec_cmd
 
 import celery
@@ -235,10 +237,12 @@ while is_to_continue:
       or total_cnt_n < batch_size:
         is_to_continue = True
         initial_seed = total_cnt_n
+        target_total_cnt = (initial_seed//batch_size + 1) * batch_size
         if min_cnt_n:
-          target_total_cnt = (initial_seed//min_cnt_n + 1) * min_min_count
-        else:
-          target_total_cnt = (initial_seed//batch_size + 1) * batch_size
+          target_total_cnt = max(
+            target_total_cnt,
+            (initial_seed//min_cnt_n + 1) * min_min_count
+          )
         for i in range(initial_seed, target_total_cnt):
           tasks.append((n, i, ""))
         total_cnts[n] = target_total_cnt
@@ -262,3 +266,5 @@ pool.map(exec_cmd, tasks)
 # cur.close()
 # con.commit()
 # con.close()
+
+# %%

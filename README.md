@@ -1,5 +1,12 @@
 # spherical code
 
+## latest results
+
+- [manual tessellation: Class I alternative](out/manual/ic1s/txt_dump/)
+- [manual tessellation: Class II (Triacon)](out/manual/ic2s/txt_dump/)
+- [min potential](out/v1.0.2/min_potential/)
+  - [table](out/v1.0.2/min_potential/table.ipynb)
+
 ## environment
 
 ```sh
@@ -34,6 +41,7 @@ The random seed here is mandatory for stable reproductivity.
   - validator: for result analysis and validation
 - out: results (raw results are too large to put into a git repo thus gitignored)
   - [ver]/[target]/txtdump/[n].txt: the best configuration of the n points found for the target
+  - [ver]/[target]/table.ipynb: result table
 - include: 3rd party libraries
 - release: version stamped programs for batch solver to use, see below for detail
 
