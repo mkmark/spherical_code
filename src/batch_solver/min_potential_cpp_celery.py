@@ -5,7 +5,7 @@ ver = "v1.0.2"
 ns = range(4, 300)
 """the range of n to calculate within current run"""
 
-min_min_count = 20
+min_min_count = 50
 """
 this value determines the minimum occurence of a minimum solution
 before it is deemed as a global minimum
@@ -208,23 +208,26 @@ class CeleryPool():
 
 
 # %%
-total_cnts, min_cnts, min_vals, min_val_seeds, missed_tasks = get_status(ns, gen_missed_tasks=True)
+# total_cnts, min_cnts, min_vals, min_val_seeds, missed_tasks = get_status(ns, gen_missed_tasks=True)
 
-while(len(missed_tasks)):
-  print(f"fixing missed tasks: {len(missed_tasks)}")
-  pool = CeleryPool()
-  pool.map(exec_cmd, missed_tasks)
-  total_cnts, min_cnts, min_vals, min_val_seeds, missed_tasks = get_status(ns, gen_missed_tasks=True)
+# while(len(missed_tasks)):
+#   print(f"fixing missed tasks: {len(missed_tasks)}")
+#   pool = CeleryPool()
+#   pool.map(exec_cmd, missed_tasks)
+#   total_cnts, min_cnts, min_vals, min_val_seeds, missed_tasks = get_status(ns, gen_missed_tasks=True)
 
 # %%
 is_to_continue = True
+is_missed_tasks_checked = False
+missed_tasks = []
 while is_to_continue:
   ## fix missed tasks in previous run
-  while(len(missed_tasks)):
+  while(not is_missed_tasks_checked or len(missed_tasks)):
     print(f"fixing missed tasks: {len(missed_tasks)}")
     pool = CeleryPool()
     pool.map(exec_cmd, missed_tasks)
     total_cnts, min_cnts, min_vals, min_val_seeds, missed_tasks = get_status(ns, gen_missed_tasks=True)
+    is_missed_tasks_checked = True
 
   is_to_continue = False
   print("gen tasks bf")

@@ -2,8 +2,10 @@
 
 ## latest results
 
-- [manual tessellation: Class I alternative](out/manual/ic1s/txt_dump/)
+`.txt` results are formated in such a way that every 3 consecutive lines represent a point's x, y, and z coordinate.
+
 - [manual tessellation: Class II (Triacon)](out/manual/ic2s/txt_dump/)
+- [manual tessellation: Class I alternative](out/manual/ic1s/txt_dump/)
 - [min potential](out/v1.0.2/min_potential/)
   - [table](out/v1.0.2/min_potential/table.ipynb)
 
